@@ -1,0 +1,24 @@
+# Files and directories to protect from mutation
+
+# Repository metadata
+.git/
+.github/
+.gitignore
+.mutignore
+
+# Documentation
+README.md
+LICENSE
+CLAUDE.md
+
+# Mutation context (don't mutate the context file itself!)
+.mutation-context.json
+
+# Scripts (don't mutate the mutation/fix scripts)
+scripts/
+
+# Dependencies and config
+requirements.txt
+config.yaml
+
+# Add project-specific files below:

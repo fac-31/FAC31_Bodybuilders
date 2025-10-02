@@ -1,0 +1,12 @@
+# Workflow 2: Mutate
+# Runs the mutator script to break the code
+# Commits mutated code + .mutation-context.json
+
+name: 2. Mutate Code
+
+on:
+  workflow_dispatch:
+  # TODO: Add trigger from previous workflow
+
+jobs:
+  # TODO: Add job to run mutator script
