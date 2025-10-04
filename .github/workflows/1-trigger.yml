@@ -1,0 +1,13 @@
+# Workflow 1: Trigger
+# Runs when main branch is updated
+# Creates/resets the mutation branch
+
+name: 1. Trigger Mutation Cycle
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  # TODO: Add job to create/reset mutation branch

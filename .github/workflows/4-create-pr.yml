@@ -1,0 +1,12 @@
+# Workflow 4: Create PR
+# Reads .mutation-context.json
+# Opens PR from mutation -> main
+
+name: 4. Create PR
+
+on:
+  workflow_dispatch:
+  # TODO: Add trigger from previous workflow
+
+jobs:
+  # TODO: Add job to create PR
