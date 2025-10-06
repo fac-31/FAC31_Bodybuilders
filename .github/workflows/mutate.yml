@@ -59,6 +59,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           base: test-main
           head: test-mutation
+          branch: mutation-auto-pr-${{ github.run_number }}
           title: "Auto PR: Test-Mutation → Test-Main"
           body: |
             This PR was automatically created after running mutator.py and fixer.py.
