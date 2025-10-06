@@ -29,8 +29,7 @@ jobs:
       - name: Merge test-main into test-mutation
         run: |
           git checkout test-mutation
-          git merge origin/test-main --no-edit || true
-          git push origin test-mutation
+          git merge --no-commit --no-ff origin/test-main || true
 
       - name: Set up Python
         uses: actions/setup-python@v5
