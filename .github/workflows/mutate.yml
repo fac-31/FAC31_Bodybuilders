@@ -54,7 +54,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           base: test-main
           branch-suffix: timestamp
-          title: "Auto PR: Test-Mutation → Test-Main"
+          title: "Bodybuilder PR: Test-Mutation → Test-Main"
           committer: "Bodybuilder[Bot] <bodybuilders@bodybuilders.com>"
           author: "Bodybuilders[Bot] <bodybuilders@bodybuilders.com>"
           body: |
