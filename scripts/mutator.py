@@ -26,8 +26,6 @@ def get_all_files(directory):
     for root, _, files in os.walk(directory):
         for file in files:
             full_path = os.path.relpath(os.path.join(root, file), directory)
-            if MUTATION_CONTEXT_PATH in full_path:
-                continue
             if ignored and ignored.match_file(full_path):
                 continue
             file_list.append(os.path.join(directory, full_path))
