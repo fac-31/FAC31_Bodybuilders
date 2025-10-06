@@ -29,7 +29,7 @@ jobs:
       - name: Merge test-main into test-mutation
         run: |
           git checkout test-mutation
-          git merge --no-commit --no-ff origin/test-main || true
+          git merge test-main
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -47,20 +47,20 @@ jobs:
       - name: Run scripts/fixer.py
         run: python scripts/fixer.py
 
-      - name: Commit changes from mutator & fixer
-        run: |
-          git add .
-          git status
-          git diff
-          git commit -m "Changes from mutator.py and fixer.py" || echo "No changes to commit"
-          git push origin test-mutation || echo "Nothing to push"
-
       - name: Create Pull Request to test-main
-        uses: peter-evans/create-pull-request@v5
+        id: pr
+        uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          committer: Bodybuilders[bot] <bodybuilders[bot]@bodybuilders.com>
           base: test-main
           branch: test-mutation
           title: "Auto PR: Test-Mutation → Test-Main"
           body: |
             This PR was automatically created after running mutator.py and fixer.py.
+          delete-branch: false
+
+      - name: Output PR info
+        run: |
+          echo "PR number: ${{ steps.pr.outputs.pull-request-number }}"
+          echo "PR URL: ${{ steps.pr.outputs.pull-request-url }}"
