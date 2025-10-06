@@ -50,6 +50,8 @@ jobs:
       - name: Commit changes from mutator & fixer
         run: |
           git add .
+          git status
+          git diff
           git commit -m "Changes from mutator.py and fixer.py" || echo "No changes to commit"
           git push origin test-mutation || echo "Nothing to push"
 
