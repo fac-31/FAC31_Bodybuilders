@@ -26,10 +26,10 @@ jobs:
           git config user.name "Bodybuilders[bot]"
           git config user.email "bodybuilders[bot]@bodybuilders.com"
 
-      - name: Merge test-main into test-mutation
+      - name: Rebase test-main into test-mutation
         run: |
           git checkout test-mutation
-          git merge test-main
+          git rebase test-main
 
       - name: Set up Python
         uses: actions/setup-python@v5
