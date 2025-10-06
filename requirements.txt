@@ -1,3 +1,4 @@
 # Python dependencies for mutation and fixing scripts
 
 # TODO: Add dependencies (e.g., openai, anthropic, requests, etc.)
+pathspec
