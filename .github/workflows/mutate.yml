@@ -52,10 +52,9 @@ jobs:
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          committer: Bodybuilders[bot] <bodybuilders[bot]@bodybuilders.com>
           base: test-main
           branch-suffix: timestamp
-          title: "Auto PR: Test-Mutation → Test-Main"
+          title: "Bodybuilder PR: Test-Mutation → Test-Main"
           committer: "Bodybuilder[Bot] <bodybuilders@bodybuilders.com>"
           author: "Bodybuilders[Bot] <bodybuilders@bodybuilders.com>"
           body: |
