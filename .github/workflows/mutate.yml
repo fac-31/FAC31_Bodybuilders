@@ -54,8 +54,10 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           committer: Bodybuilders[bot] <bodybuilders[bot]@bodybuilders.com>
           base: test-main
-          branch: test-mutation
+          branch-suffix: timestamp
           title: "Auto PR: Test-Mutation → Test-Main"
+          committer: "Bodybuilder[Bot] <bodybuilders@bodybuilders.com>"
+          author: "Bodybuilders[Bot] <bodybuilders@bodybuilders.com>"
           body: |
             This PR was automatically created after running mutator.py and fixer.py.
           delete-branch: false
