@@ -22,11 +22,9 @@ result = roll_mutation("medium", file_lines=100)
 # {
 #   "num_blocks": 2,
 #   "blocks": [
-#     {"block_id": 1, "lines_to_delete": 8},
-#     {"block_id": 2, "lines_to_delete": 13}
-#   ],
-#   "total_lines": 21,
-#   "percentage": 21.0
+#     {"start_line": 15, "lines_to_delete": 8},
+#     {"start_line": 50, "lines_to_delete": 13}
+#   ]
 # }
 ```
 

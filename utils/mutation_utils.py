@@ -7,9 +7,15 @@ import random
 
 def roll_mutation(flavor, file_lines, seed=None):
     """
-    Decide how many blocks and lines to delete
+    Decide how many blocks and lines to delete, and where
 
-    Returns: {"num_blocks": 2, "blocks": [...], "total_lines": 15, "percentage": 15.0}
+    Returns: {
+        "num_blocks": 2,
+        "blocks": [
+            {"start_line": 15, "lines_to_delete": 8},
+            {"start_line": 50, "lines_to_delete": 13}
+        ]
+    }
     """
     if seed:
         random.seed(seed)
@@ -37,7 +43,17 @@ def roll_mutation(flavor, file_lines, seed=None):
     end_prob = ms["end_probability"]
 
     blocks = []
+    lines_deleted_so_far = 0
+    used_ranges = []  # Track (start, end) to avoid overlaps
+
     for i in range(num_blocks):
+        # Calculate how many lines are still available
+        lines_remaining = file_lines - lines_deleted_so_far
+
+        # If we've already deleted everything, stop
+        if lines_remaining <= 0:
+            break
+
         # Create 20 sample points between min and max percent
         percentages = []
         probabilities = []
@@ -54,17 +70,43 @@ def roll_mutation(flavor, file_lines, seed=None):
         sampled_percent = random.choices(percentages, weights=probabilities)[0]
         lines = max(1, int(file_lines * sampled_percent / 100))
 
-        blocks.append({"block_id": i + 1, "lines_to_delete": lines})
+        # Cap at remaining lines
+        lines = min(lines, lines_remaining)
 
-    total_lines = sum(b["lines_to_delete"] for b in blocks)
+        # Pick a random start line that doesn't overlap with previous blocks
+        max_attempts = 50
+        start_line = None
+
+        for _ in range(max_attempts):
+            # Random start between 1 and (file_lines - lines + 1)
+            candidate_start = random.randint(1, max(1, file_lines - lines + 1))
+            candidate_end = candidate_start + lines - 1
+
+            # Check if this overlaps with any existing block
+            overlaps = False
+            for existing_start, existing_end in used_ranges:
+                if not (candidate_end < existing_start or candidate_start > existing_end):
+                    overlaps = True
+                    break
+
+            if not overlaps:
+                start_line = candidate_start
+                used_ranges.append((candidate_start, candidate_end))
+                break
+
+        # If we couldn't find a non-overlapping spot, skip this block
+        if start_line is None:
+            continue
+
+        blocks.append({
+            "start_line": start_line,
+            "lines_to_delete": lines
+        })
+        lines_deleted_so_far += lines
 
     return {
-        "flavor": flavor,
-        "num_blocks": num_blocks,
-        "blocks": blocks,
-        "total_lines": total_lines,
-        "file_lines": file_lines,
-        "percentage": round(total_lines / file_lines * 100, 2)
+        "num_blocks": len(blocks),
+        "blocks": blocks
     }
 
 
@@ -73,5 +115,5 @@ if __name__ == "__main__":
         print(f"\n{flavor.upper()}")
         for _ in range(3):
             result = roll_mutation(flavor, 100)
-            blocks_str = ", ".join(f"{b['lines_to_delete']}L" for b in result['blocks'])
-            print(f"  {result['num_blocks']} blocks: [{blocks_str}] = {result['total_lines']}L ({result['percentage']}%)")
+            blocks_str = ", ".join(f"L{b['start_line']}+{b['lines_to_delete']}" for b in result['blocks'])
+            print(f"  {result['num_blocks']} blocks: {blocks_str}")
