@@ -56,3 +56,27 @@ Example structure:
 - Mutator is procedural (deterministic random deletion)
 - Fixer uses a non-cutting-edge LLM
 - `.mutignore` protects specific files from mutation
+
+## Code Structure
+
+### Mutation Configuration (`mutation_config.json`)
+
+Defines three flavors: `conservative`, `medium`, `crazy`
+
+Each flavor specifies:
+- `blocks_to_mutate`: Probability distribution for 1, 2, or 3 blocks
+- `mutation_size`: Linear distribution (min/max percent, start/end probability)
+
+### Utils (`utils/`)
+
+**`mutation_utils.py`** - Core mutation utilities:
+- `roll_mutation(flavor, file_lines, seed)` - Main function to determine mutation parameters
+- Returns: `{"num_blocks": 2, "blocks": [...], "total_lines": 15, "percentage": 15.0}`
+- Uses linear interpolation to sample percentage of lines to delete
+
+### Context (`context/`)
+
+**`context_utils.py`** - MutationContext class for creating `.mutation-context.json`:
+- `add_mutation()` - Add mutation metadata
+- `save()` - Write context to JSON
+- `load()` - Read existing context
