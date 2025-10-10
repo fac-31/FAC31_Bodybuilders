@@ -2,7 +2,7 @@
 """Create and manage .mutation-context.json files"""
 
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 
 
 class MutationContext:
@@ -10,8 +10,8 @@ class MutationContext:
 
     def __init__(self, seed=None, config=None):
         """Initialize new context with timestamp and ID"""
-        now = datetime.utcnow()
-        self.timestamp = now.isoformat() + "Z"
+        now = datetime.now(timezone.utc)
+        self.timestamp = now.isoformat().replace("+00:00", "Z")
         self.mutation_id = f"mut-{now.strftime('%Y%m%d-%H%M%S')}"
         self.seed = seed
         self.config = config or {}
