@@ -17,22 +17,29 @@ class MutationContext:
         self.config = config or {}
         self.mutations = []
 
-    def add_mutation(self, file_path, start_line, end_line, deleted_line_count,
-                     context_before, context_after):
-        """Add a mutation to the context"""
+    def add_mutation(self, file_path, start_line, deleted_line_count):
+        """Record that the mutator removed some lines"""
         mutation_id = f"mut-{len(self.mutations) + 1}"
 
         mutation = {
             "id": mutation_id,
             "file": file_path,
-            "location": {"start_line": start_line, "end_line": end_line},
+            "start_line": start_line,
             "deleted_line_count": deleted_line_count,
-            "context_before": context_before,
-            "context_after": context_after
+            "added_code": None
         }
 
         self.mutations.append(mutation)
         return mutation_id
+
+    def record_fix(self, mutation_id, added_code):
+        """Attach fixer-generated code to an existing mutation"""
+        for mutation in self.mutations:
+            if mutation["id"] == mutation_id:
+                mutation["added_code"] = added_code
+                return
+
+        raise ValueError(f"Unknown mutation_id '{mutation_id}'")
 
     def save(self, path=".mutation-context.json"):
         """Save context to JSON file"""
@@ -64,14 +71,16 @@ if __name__ == "__main__":
     # Example
     ctx = MutationContext(seed=12345, config={"flavor": "medium"})
 
-    ctx.add_mutation(
+    mut_id = ctx.add_mutation(
         file_path="src/app.py",
         start_line=42,
-        end_line=42,
-        deleted_line_count=1,
-        context_before=["def main():", "    setup()"],
-        context_after=["    return 0"]
+        deleted_line_count=3
     )
+
+    ctx.record_fix(mut_id, added_code=[
+        "def main():",
+        "    return 0"
+    ])
 
     print(f"Created context: {ctx.mutation_id}")
     print(f"Mutations: {len(ctx.mutations)}")

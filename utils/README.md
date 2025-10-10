@@ -38,8 +38,9 @@ result = roll_mutation("medium", file_lines=100)
 
 **How it works:**
 1. Create a context with timestamp and ID
-2. Add mutations (file, location, line count, context before/after)
-3. Save to JSON file
+2. Mutator records each deletion (file, start line, deleted line count)
+3. Fixer attaches regenerated code to those mutations
+4. Save to JSON file
 
 **Usage:**
 ```python
@@ -48,15 +49,19 @@ from utils.context_utils import MutationContext
 # Create context
 ctx = MutationContext(seed=12345, config={"flavor": "medium"})
 
-# Add mutation info (WITHOUT the deleted code)
-ctx.add_mutation(
+# Mutator: record removed block
+mut_id = ctx.add_mutation(
     file_path="src/app.py",
     start_line=10,
-    end_line=15,
-    deleted_line_count=6,
-    context_before=["def main():", "    setup()"],
-    context_after=["    return 0"]
+    deleted_line_count=6
 )
+
+# Fixer: attach regenerated lines
+ctx.record_fix(mut_id, added_code=[
+    "def main():",
+    "    setup()",
+    "    return 0"
+])
 
 # Save
 ctx.save()  # Creates .mutation-context.json
