@@ -43,7 +43,7 @@ def regular_mutation(file_path, flavor, ctx):
         print("No lines to delete.")
         return
 
-    mutation_spec = roll_mutation(flavor, file_lines)
+    mutation_spec = roll_mutation(flavor, len(file_lines))
     blocks = sorted(mutation_spec['blocks'], key=lambda b: b['start_line'], reverse=True)
 
     for block in blocks:
