@@ -129,10 +129,10 @@ def setup_mutation(output, auto):
         workout = "medium"  # default for CI
         click.echo(f"Running in auto mode: workout plan = {workout}")
 
-    # --- Write to .github/workflows/mutate.yml ---
-    mutate_path = Path(".github/workflows/mutate.yml")
+    # --- Write to .github/workflows/mutator.yml ---
+    mutate_path = Path(".github/workflows/mutator.yml")
     if not mutate_path.exists():
-        click.echo(click.style("mutate.yml not found!", fg="red"))
+        click.echo(click.style("mutator.yml not found!", fg="red"))
         return
 
     match_text = "python scripts/mutator.py"
@@ -148,7 +148,7 @@ def setup_mutation(output, auto):
 
     if updated:
         mutate_path.write_text("\n".join(lines) + "\n")
-        click.echo(click.style(f"Updated mutate.yml with workout plan: {workout.upper()}", fg="green"))
+        click.echo(click.style(f"Updated mutator.yml with workout plan: {workout.upper()}", fg="green"))
     else:
         click.echo(click.style("No update made — match not found.", fg="yellow"))
 
