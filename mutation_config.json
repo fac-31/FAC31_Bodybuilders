@@ -1,0 +1,47 @@
+{
+  "conservative": {
+    "description": "Minimal code changes with high confidence fixes",
+    "blocks_to_mutate": {
+      "1": 0.70,
+      "2": 0.25,
+      "3": 0.05
+    },
+    "mutation_size": {
+      "type": "linear",
+      "min_percent": 3,
+      "max_percent": 15,
+      "start_probability": 0.70,
+      "end_probability": 0.10
+    }
+  },
+  "medium": {
+    "description": "Balanced approach with moderate mutations",
+    "blocks_to_mutate": {
+      "1": 0.50,
+      "2": 0.35,
+      "3": 0.15
+    },
+    "mutation_size": {
+      "type": "linear",
+      "min_percent": 3,
+      "max_percent": 33,
+      "start_probability": 0.60,
+      "end_probability": 0.05
+    }
+  },
+  "crazy": {
+    "description": "Aggressive mutations to stress-test the fixer",
+    "blocks_to_mutate": {
+      "1": 0.20,
+      "2": 0.40,
+      "3": 0.40
+    },
+    "mutation_size": {
+      "type": "linear",
+      "min_percent": 10,
+      "max_percent": 40,
+      "start_probability": 0.50,
+      "end_probability": 0.10
+    }
+  }
+}
