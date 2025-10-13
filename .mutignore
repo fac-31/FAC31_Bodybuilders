@@ -22,3 +22,15 @@ requirements.txt
 config.yaml
 
 # Add project-specific files below:
+
+
+# Specific extensions
+*.py
+*.js
+*.ts
+# Project-specific protected files
+/scripts 
+
+# Project-specific protected files
+ 
+  
