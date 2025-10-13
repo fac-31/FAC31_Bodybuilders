@@ -96,6 +96,8 @@ jobs:
         run: |
           export PYTHONPATH="${PYTHONPATH}:$(pwd)"
           python scripts/fixer.py
+        env:
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
 
       - name: Create Pull Request to main
         id: pr

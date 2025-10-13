@@ -6,6 +6,8 @@ Calls LLM to generate fixes
 Applies fixes to mutated files
 """
 
+import os
+import anthropic
 import sys
 from pathlib import Path
 
@@ -15,38 +17,40 @@ if str(ROOT_DIR) not in sys.path:
 
 from utils.context_utils import MutationContext
 
-MARKER = "#mutator_was_here"
-PLACEHOLDER_LINE = "FIXER_PLACEHOLDER\n"
+def _format_prompt(file_path):
+    file_content = None
+    with open(file_path, 'r') as f:
+        file_content = f.read()
+    
+    prompt = f"You are a code repair assistant.
+    The following Python file has been automatically mutated. Some lines of code were deleted and replaced with the marker `#mutator_was_here`. Your task is to infer and regenerate the missing code for each of those deleted sections.
+    
+    Instructions:
+    - For every '#mutator_was_here' line, generate code that reasonably fits the surrounding context.
+    - Insert your regenerated code directly after the '#mutator_was_here' line.
+    - Replace each '#mutator_was_here' comment with the comment '#fixer_was_here'.
+    - Maintain correct indentation and syntax.
+    - Preserve all other code exactly as-is.
+    
+    File path: `{file_path}`
+    Here is the current content of the file:
+    ```python{file_content}```
+    Please return the entire repaired file with your changes included.
+    "
 
+def _run_fix(file_path, anthropic_api_key):
+    client = anthropic.Anthropic(api_key=anthropic_api_key)
+    prompt = format_prompt(file_path)
 
-def _read_file_lines(path):
-    """Best-effort load of a mutated file, tolerating deletions."""
-    try:
-        with open(path, "r", encoding="utf-8", errors="ignore") as f:
-            return f.readlines()
-    except FileNotFoundError:
-        print(f"  ! mutated file missing: {path}", file=sys.stderr)
-        return None
+    message = client.messages.create(
+        model="claude-3-sonnet-20240229",
+        max_tokens=4000,
+        temperature=1,
+        system="You are a helpful code assistant.",
+        messages=[{"role": "user", "content": prompt}]
+    )
 
-
-def _find_marker_lines(lines):
-    """Return 1-based indices where the mutator placeholder remains."""
-    return [idx for idx, line in enumerate(lines, start=1) if line.strip() == MARKER]
-
-
-def _build_placeholder_lines(count):
-    """Create minimal filler lines to stand in for missing code."""
-    count = max(1, count)
-    return [PLACEHOLDER_LINE for _ in range(count)]
-
-
-def _replace_marker(lines, replacements):
-    """Swap the first marker occurrence with the planned replacement lines."""
-    for idx, line in enumerate(lines):
-        if line.strip() == MARKER:
-            return lines[:idx] + replacements + lines[idx + 1 :]
-    return lines
-
+    return message.content[0].text
 
 def main():
     try:
@@ -55,37 +59,13 @@ def main():
         print("No mutation context found. Did the mutator run?", file=sys.stderr)
         sys.exit(1)
 
-    print(f"Loaded mutation context {ctx.mutation_id}")
-    for mutation in ctx.mutations:
-        file_path = mutation["file"]
-        start_line = mutation["start_line"]
-        deleted = mutation["deleted_line_count"]
-        print(f"- {file_path}: start_line={start_line}, deleted_lines={deleted}")
+    file_path = ctx.mutations[0]["file"]
+    anthropic_api_key = os.getenv("LLM_API_KEY")
 
-        lines = _read_file_lines(file_path)
-        if lines is None:
-            continue
+    repaired_file_content = _run_fix(file_path, anthropic_api_key)
 
-        marker_lines = _find_marker_lines(lines)
-        if marker_lines:
-            print(f"  marker found at lines: {marker_lines}")
-            fillers = _build_placeholder_lines(deleted)
-            print(f"  planned replacement lines: {len(fillers)} (first line: {fillers[0].rstrip()})")
-
-            updated = _replace_marker(lines, fillers)
-            if updated != lines:
-                with open(file_path, "w", encoding="utf-8") as f:
-                    f.writelines(updated)
-                ctx.record_fix(mutation["id"], added_code=fillers)
-                print(f"  marker replaced and recorded in context")
-            else:
-                print("  ! expected marker missing during write")
-        else:
-            print("  ! marker not found in file")
-
-    ctx.save()
-    print("Updated mutation context saved.")
-
+    with open(file_path, "w") as f:
+        f.write(repaired_file_content)
 
 if __name__ == "__main__":
     main()
