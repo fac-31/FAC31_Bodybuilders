@@ -1,0 +1,17 @@
+{
+  "timestamp": "2025-10-13T12:05:55.342318Z",
+  "mutation_id": "mut-20251013-120555",
+  "seed": null,
+  "config": {
+    "flavor": "medium"
+  },
+  "mutations": [
+    {
+      "id": "mut-1",
+      "file": "./test_projects/simpletic/application.py",
+      "start_line": 41,
+      "deleted_line_count": 3,
+      "added_code": null
+    }
+  ]
+}
