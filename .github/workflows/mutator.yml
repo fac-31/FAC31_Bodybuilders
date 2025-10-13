@@ -45,20 +45,37 @@ jobs:
 
       - name: Rebase test-main into test-mutation
         run: |
-          git fetch origin test-main
-          git fetch origin test-mutation || echo "No remote branch test-mutation yet"
+          set -e
+          BRANCH_NAME="test-mutation"
+          BASE_BRANCH="test-main"
 
-          # Check if local branch exists
-          if git show-ref --verify --quiet refs/heads/test-mutation; then
-            echo "Local branch test-mutation exists"
-            git checkout test-mutation
+          echo "Fetching branches..."
+          git fetch origin $BASE_BRANCH
+          git fetch origin $BRANCH_NAME || echo "Remote branch $BRANCH_NAME does not exist yet"
+
+          # Ensure local base branch exists
+          if ! git show-ref --verify --quiet "refs/heads/$BASE_BRANCH"; then
+            git checkout -b "$BASE_BRANCH" "origin/$BASE_BRANCH"
           else
-            echo "Creating local tracking branch for test-mutation"
-            git checkout -b test-mutation origin/test-mutation || git checkout -b test-mutation origin/test-main
+            git checkout "$BASE_BRANCH"
+            git reset --hard "origin/$BASE_BRANCH"
           fi
 
-          # Now perform rebase
-          git rebase origin/test-main || { echo "Rebase failed"; exit 1; }
+          # Ensure local mutation branch exists
+          if git show-ref --verify --quiet "refs/heads/$BRANCH_NAME"; then
+            echo "Local branch $BRANCH_NAME exists"
+            git checkout "$BRANCH_NAME"
+          elif git ls-remote --exit-code --heads origin "$BRANCH_NAME"; then
+            echo "Remote branch $BRANCH_NAME exists, creating local tracking branch"
+            git checkout -b "$BRANCH_NAME" "origin/$BRANCH_NAME"
+          else
+            echo "Branch $BRANCH_NAME does not exist at all. Creating from $BASE_BRANCH"
+            git checkout -b "$BRANCH_NAME" "origin/$BASE_BRANCH"
+            git push origin "$BRANCH_NAME"
+          fi
+
+          echo "Rebasing $BRANCH_NAME onto $BASE_BRANCH..."
+          git rebase "origin/$BASE_BRANCH" || { echo "Rebase failed"; exit 1; }
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -71,10 +88,14 @@ jobs:
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
       - name: Run scripts/mutator.py
-        run: python scripts/mutator.py
+        run: |
+          export PYTHONPATH="${PYTHONPATH}:$(pwd)"
+          python scripts/mutator.py
 
       - name: Run scripts/fixer.py
-        run: python scripts/fixer.py
+        run: |
+          export PYTHONPATH="${PYTHONPATH}:$(pwd)"
+          python scripts/fixer.py
 
       - name: Create Pull Request to test-main
         id: pr
