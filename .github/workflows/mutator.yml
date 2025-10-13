@@ -46,8 +46,19 @@ jobs:
       - name: Rebase test-main into test-mutation
         run: |
           git fetch origin test-main
-          git checkout test-mutation
-          git rebase origin/test-main || { echo "Rebase failed"; exist 1; }
+          git fetch origin test-mutation || echo "No remote branch test-mutation yet"
+
+          # Check if local branch exists
+          if git show-ref --verify --quiet refs/heads/test-mutation; then
+            echo "Local branch test-mutation exists"
+            git checkout test-mutation
+          else
+            echo "Creating local tracking branch for test-mutation"
+            git checkout -b test-mutation origin/test-mutation || git checkout -b test-mutation origin/test-main
+          fi
+
+          # Now perform rebase
+          git rebase origin/test-main || { echo "Rebase failed"; exit 1; }
 
       - name: Set up Python
         uses: actions/setup-python@v5
