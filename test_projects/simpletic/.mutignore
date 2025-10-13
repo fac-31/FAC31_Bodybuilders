@@ -1,0 +1,8 @@
+# Files and directories to protect from mutation
+
+# Repository metadata
+.git/
+.github/
+.gitignore
+.mutignore
+__pycache__/
