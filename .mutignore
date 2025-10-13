@@ -22,3 +22,10 @@ requirements.txt
 config.yaml
 
 # Add project-specific files below:
+
+# Limit mutations to the simpletic test project only
+*
+!test_projects/
+test_projects/*
+!test_projects/simpletic/
+!test_projects/simpletic/**

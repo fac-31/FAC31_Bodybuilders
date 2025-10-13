@@ -7,6 +7,11 @@ Applies fixes to mutated files
 """
 
 import sys
+from pathlib import Path
+
+ROOT_DIR = Path(__file__).resolve().parent.parent
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
 
 from utils.context_utils import MutationContext
 
@@ -35,6 +40,14 @@ def _build_placeholder_lines(count):
     return [PLACEHOLDER_LINE for _ in range(count)]
 
 
+def _replace_marker(lines, replacements):
+    """Swap the first marker occurrence with the planned replacement lines."""
+    for idx, line in enumerate(lines):
+        if line.strip() == MARKER:
+            return lines[:idx] + replacements + lines[idx + 1 :]
+    return lines
+
+
 def main():
     try:
         ctx = MutationContext.load()
@@ -58,8 +71,20 @@ def main():
             print(f"  marker found at lines: {marker_lines}")
             fillers = _build_placeholder_lines(deleted)
             print(f"  planned replacement lines: {len(fillers)} (first line: {fillers[0].rstrip()})")
+
+            updated = _replace_marker(lines, fillers)
+            if updated != lines:
+                with open(file_path, "w", encoding="utf-8") as f:
+                    f.writelines(updated)
+                ctx.record_fix(mutation["id"], added_code=fillers)
+                print(f"  marker replaced and recorded in context")
+            else:
+                print("  ! expected marker missing during write")
         else:
             print("  ! marker not found in file")
+
+    ctx.save()
+    print("Updated mutation context saved.")
 
 
 if __name__ == "__main__":

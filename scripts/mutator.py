@@ -4,10 +4,16 @@ Mutator Script
 Performs random deletions on the codebase
 """
 
+import sys
+from pathlib import Path
+
 import os
 import random
 import pathspec
-import sys
+
+ROOT_DIR = Path(__file__).resolve().parent.parent
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
 
 from utils.mutation_utils import roll_mutation
 from utils.context_utils import MutationContext
