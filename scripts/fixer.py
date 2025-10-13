@@ -40,7 +40,7 @@ def _format_prompt(file_path):
 
 def _run_fix(file_path, anthropic_api_key):
     client = anthropic.Anthropic(api_key=anthropic_api_key)
-    prompt = format_prompt(file_path)
+    prompt = _format_prompt(file_path)
 
     message = client.messages.create(
         model="claude-3-sonnet-20240229",
