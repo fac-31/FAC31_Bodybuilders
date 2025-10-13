@@ -11,24 +11,10 @@ app.config["SESSION_FILE_DIR"]= mkdtemp()
 app.config["SESSION_PERMENANT"]= False
 app.config["SESSION_TYPE"]= "filesystem"
 Session(app)
-
-@app.route("/")
-def index():
-    session['board'] = [[None,None,None],[None,None,None],[None,None,None]]
-    session['turn'] = 'x'
-    session['over'] = None
-    return render_template('index.html', board=session['board'], turn=session['turn'])
-
-@app.route('/play/<int:row>/<int:col>')
-def play(row,col):
-    i = row
-    j = col
-    session['board'][i][j] = session['turn']
+#mutator_was_here
     session['over'] = check(session['turn'])
     session['turn'] = 'x' if session['turn'] is 'o' else 'o'
-    return redirect('/playing')
-
-@app.route('/playing')
+#mutator_was_here
 def playing():
     return render_template('index.html', board=session['board'], turn=session['turn'], win=session['over'])
 def check(turn):
