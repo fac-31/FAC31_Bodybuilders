@@ -11,6 +11,7 @@ import sys
 from utils.context_utils import MutationContext
 
 MARKER = "#mutator_was_here"
+PLACEHOLDER_LINE = "FIXER_PLACEHOLDER\n"
 
 
 def _read_file_lines(path):
@@ -26,6 +27,12 @@ def _read_file_lines(path):
 def _find_marker_lines(lines):
     """Return 1-based indices where the mutator placeholder remains."""
     return [idx for idx, line in enumerate(lines, start=1) if line.strip() == MARKER]
+
+
+def _build_placeholder_lines(count):
+    """Create minimal filler lines to stand in for missing code."""
+    count = max(1, count)
+    return [PLACEHOLDER_LINE for _ in range(count)]
 
 
 def main():
@@ -49,6 +56,8 @@ def main():
         marker_lines = _find_marker_lines(lines)
         if marker_lines:
             print(f"  marker found at lines: {marker_lines}")
+            fillers = _build_placeholder_lines(deleted)
+            print(f"  planned replacement lines: {len(fillers)} (first line: {fillers[0].rstrip()})")
         else:
             print("  ! marker not found in file")
 
