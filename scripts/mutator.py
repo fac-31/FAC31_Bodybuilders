@@ -1,9 +1,4 @@
-#!/usr/bin/env python3
-"""
-Mutator Script
-Performs random deletions on the codebase
-"""
-
+# TODO: Implement mutation logic
 import os
 import random
 import pathspec
