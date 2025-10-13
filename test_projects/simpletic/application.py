@@ -6,8 +6,8 @@ app = Flask(__name__)
 # Ensure templates are auto-reloaded
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 
-# session config
-app.config["SESSION_FILE_DIR"]= mkdtemp()
+#fixer_was_here
+app.config["SESSION_FILE_DIR"] = mkdtemp()
 app.config["SESSION_PERMENANT"]= False
 app.config["SESSION_TYPE"]= "filesystem"
 Session(app)
