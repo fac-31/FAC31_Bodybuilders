@@ -6,31 +6,106 @@
 .gitignore
 .mutignore
 
-# Documentation
-README.md
-LICENSE
-CLAUDE.md
+# Documentation and Licenses
+README*
+LICENSE*
+CHANGELOG*
+CONTRIBUTING*
+CODE_OF_CONDUCT*
+docs/
+documentation/
+*.md
+*.rst
+*.txt
 
-# Mutation context (don't mutate the context file itself!)
+# Mutation context (don’t mutate the context file itself!)
 .mutation-context.json
+mutation.log
+mutation-report.json
 
-# Scripts (don't mutate the mutation/fix scripts)
+# Scripts and automation
 scripts/
+tools/
+build/
+deploy/
+ci/
+*.sh
+*.bat
+*.ps1
+*.cmd
 
-# Dependencies and config
+# Dependencies and configuration
 requirements.txt
+Pipfile
+Pipfile.lock
+poetry.lock
+pyproject.toml
+package.json
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
 config.yaml
+config.yml
+settings.json
+.env
+.env.*
+.dockerignore
+Dockerfile
+docker-compose*
+Makefile
 
-# Add project-specific files below:
+# Test and data fixtures
+tests/
+test/
+__tests__/
+*.test.*
+*.spec.*
+fixtures/
+data/
+mock/
+*.csv
+*.json
+*.yaml
+*.yml
 
+# Build artifacts and generated files
+dist/
+build/
+out/
+node_modules/
+venv/
+.env/
+.env.example
+.cache/
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.egg-info/
+*.log
+*.tmp
+*.bak
+*.swp
 
-# Specific extensions
+# Project-specific protected files
+assets/
+static/
+public/
+templates/
+migrations/
+local_settings.py
+manage.py
+
+# Specific file extensions (language-specific)
 *.py
+*.ipynb
 *.js
+*.jsx
 *.ts
-# Project-specific protected files
-/scripts 
-
-# Project-specific protected files
- 
-  
+*.tsx
+*.java
+*.kt
+*.go
+*.cpp
+*.c
+*.h

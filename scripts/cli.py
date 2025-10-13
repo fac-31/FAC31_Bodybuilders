@@ -67,7 +67,7 @@ def setup_mutation(output, auto):
     path = Path(output)
     if not path.exists():
         click.echo(click.style(f"⚠️ {output} not found!", fg="red"))
-        return
+        return  # ✅ properly scoped
 
     # --- Ask for project-specific files ---
     project_specific = []
@@ -79,27 +79,80 @@ def setup_mutation(output, auto):
             project_specific.append(pattern)
 
     if project_specific:
-        with path.open("a") as f:
-            f.write("\n# Project-specific protected files\n")
-            f.write("\n".join(project_specific) + "\n")
-        click.echo(click.style(f"✅ Added {len(project_specific)} project-specific entries.", fg="green"))
+        content = path.read_text().splitlines()
+        section_header = "# Project-specific protected files"
+        insert_index = None
+
+        # Find where to insert after the section header
+        for i, line in enumerate(content):
+            if line.strip() == section_header:
+                insert_index = i + 1
+                break
+
+        if insert_index is not None:
+            # Insert entries directly after the header section
+            for entry in reversed(project_specific):
+                content.insert(insert_index, entry)
+            path.write_text("\n".join(content) + "\n")
+            click.echo(click.style(f"Added {len(project_specific)} entries under 'Project-specific protected files' section.", fg="green"))
+        else:
+            # Fallback if header not found
+            with path.open("a") as f:
+                f.write("\n# Project-specific protected files\n")
+                f.write("\n".join(project_specific) + "\n")
+            click.echo(click.style("⚠️ Header not found — appended entries at end of file.", fg="yellow"))
 
     # --- Ask for workout plan (mutation severity) ---
     if not auto:
         click.echo("\nChoose your workout plan:")
-        workout = click.prompt(
-            "Options: [light / medium / hardcore]",
-            type=click.Choice(['light', 'medium', 'hardcore'], case_sensitive=False)
-        )
-        click.echo(click.style(f" Selected workout plan: {workout.upper()}", fg="cyan", bold=True))
+        options = [
+            "1. Conservative",
+            "2. Medium",
+            "3. Crazy",
+            "4. Pure and Utter Madness"
+        ]
+        for opt in options:
+            click.echo(click.style(opt, fg="cyan"))
+
+        choice = click.prompt("Select a number (1-4)", type=int)
+
+        workout_map = {
+            1: "conservative",
+            2: "medium",
+            3: "crazy",
+            4: "pure_and_utter_madness"
+        }
+
+        workout = workout_map.get(choice, "medium")
+        click.echo(click.style(f"Selected workout plan: {workout.upper()}", fg="cyan", bold=True))
     else:
         workout = "medium"  # default for CI
         click.echo(f"Running in auto mode: workout plan = {workout}")
 
-    # Save configuration
-    config_path = Path(".mutation-config.txt")
-    config_path.write_text(f"mutation_severity={workout}\n")
-    click.echo(f"Configuration saved to {config_path.resolve()}")
+    # --- Write to .github/workflows/mutate.yml ---
+    mutate_path = Path(".github/workflows/mutate.yml")
+    if not mutate_path.exists():
+        click.echo(click.style("mutate.yml not found!", fg="red"))
+        return
+
+    match_text = "python scripts/mutator.py"
+    updated = False
+    lines = mutate_path.read_text().splitlines()
+
+    for i, line in enumerate(lines):
+        if match_text in line:
+            before = line.split(match_text)[0]
+            lines[i] = f"{before}{match_text} {workout}"
+            updated = True
+            break
+
+    if updated:
+        mutate_path.write_text("\n".join(lines) + "\n")
+        click.echo(click.style(f"Updated mutate.yml with workout plan: {workout.upper()}", fg="green"))
+    else:
+        click.echo(click.style("No update made — match not found.", fg="yellow"))
+
+    click.echo(click.style("\nSetup complete!", fg="green", bold=True))
 
 
 if __name__ == "__main__":
