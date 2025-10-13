@@ -22,7 +22,7 @@ def _format_prompt(file_path):
     with open(file_path, 'r') as f:
         file_content = f.read()
     
-    prompt = f"""You are a code repair assistant.
+    return f"""You are a code repair assistant.
     The following Python file has been automatically mutated. Some lines of code were deleted and replaced with the marker `#mutator_was_here`. Your task is to infer and regenerate the missing code for each of those deleted sections.
     
     Instructions:
@@ -46,11 +46,10 @@ def _run_fix(file_path, anthropic_api_key):
         model="claude-sonnet-4-5-20250929",
         max_tokens=4000,
         temperature=1,
-        system="You are a helpful code assistant.",
-        messages=[{"role": "user", "content": [prompt]}]
+        messages=[{"role": "system", "content": "You are a helpful code assistant."}, {"role": "user", "content": prompt}]
     )
 
-    return message.content[0].text
+    return message.completion
 
 def main():
     try:
