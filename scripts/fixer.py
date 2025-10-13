@@ -46,7 +46,8 @@ def _run_fix(file_path, anthropic_api_key):
         model="claude-sonnet-4-5-20250929",
         max_tokens=4000,
         temperature=1,
-        messages=[{"role": "system", "content": "You are a helpful code assistant."}, {"role": "user", "content": prompt}]
+        system="You are a helpful code assistant.",
+        messages=[{"role": "user", "content": prompt}]
     )
 
     return message.completion
