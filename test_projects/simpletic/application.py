@@ -38,9 +38,7 @@ def check(turn):
         if session['board'][i][0] == turn and session['board'][i][1] == turn and session['board'][i][2] == turn:
             return turn
 
-    # check cols
-    for i in range(3):
-        if session['board'][0][i] == turn and session['board'][1][i] == turn and session['board'][2][i] == turn:
+#mutator_was_here
             return turn
         
     # check diagonals
