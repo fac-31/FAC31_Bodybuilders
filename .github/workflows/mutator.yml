@@ -97,6 +97,25 @@ jobs:
           export PYTHONPATH="${PYTHONPATH}:$(pwd)"
           python scripts/fixer.py
 
+      - name: Capture mutation context
+        id: capture
+        run: |
+          MUTATION_OUTPUT=$(cat mutation-context.json)
+          echo "mutation_output<<EOF" >> $GITHUB_OUTPUT
+          echo "$MUTATION_OUTPUT" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Summarize mutation context
+        id: summary
+        run: |
+          SUMMARY=$(jq -r '
+            "Timestamp: \(.timestamp)\nMutation ID: \(.mutation_id)\nFlavor: \(.config.flavor)\nMutated Files:\n" +
+            (.mutations[] | "  - \(.file) lines \(.start_line)–\(.start_line + .deleted_line_count - 1)")
+          ' mutation-context.json)
+          echo "mutation_summary<<EOF" >> $GITHUB_OUTPUT
+          echo "$SUMMARY" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
       - name: Create Pull Request to main
         id: pr
         uses: peter-evans/create-pull-request@v7
@@ -108,7 +127,9 @@ jobs:
           committer: "Bodybuilder[Bot] <bodybuilders@bodybuilders.com>"
           author: "Bodybuilders[Bot] <bodybuilders@bodybuilders.com>"
           body: |
-            This PR was automatically created after running mutator.py and fixer.py.
+            **Mutation Summary:**
+            ${{ steps.summary.outputs.mutation_summary }}
+
           delete-branch: false
 
       - name: Output PR info
