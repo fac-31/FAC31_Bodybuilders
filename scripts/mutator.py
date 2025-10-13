@@ -66,7 +66,7 @@ def regular_mutation(file_path, flavor, ctx):
         f.writelines(file_lines)
 
 def mega_mutation(file_path, ctx):
-    # Deletes entire file.
+    # Deletes all lines from one file.
     with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
         file_lines = f.readlines()
     if not file_lines:
@@ -74,13 +74,16 @@ def mega_mutation(file_path, ctx):
         return
 
     try:
-        os.remove(file_path)
+        with open(file_path, 'w') as f:
+            f.writelines([])
+
         ctx.add_mutation(
             file_path=file_path,
             start_line=1,
             deleted_line_count=len(file_lines)
         )
-    except Exception:
+    except Exception as e:
+        print(f"Error during mega mutation: {e}")
         return
 
 def run_mutation(directory, flavor):
@@ -89,7 +92,12 @@ def run_mutation(directory, flavor):
         print("No files to mutate.")
         return
 
-    ctx = MutationContext(config={"flavor": flavor})
+    ctx = None
+    if os.path.exists('.mutation-context.json'):
+        ctx = MutationContext.load()
+    else:
+        ctx = MutationContext(config={"flavor": flavor})
+    
     target = random.choice(files)
     if flavor != 'pure_and_utter_madness':
         regular_mutation(target, flavor, ctx)
