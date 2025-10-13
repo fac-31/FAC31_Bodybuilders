@@ -90,7 +90,7 @@ jobs:
       - name: Run scripts/mutator.py
         run: |
           export PYTHONPATH="${PYTHONPATH}:$(pwd)"
-          python scripts/mutator.py
+          python scripts/mutator.py medium
 
       - name: Run scripts/fixer.py
         run: |
