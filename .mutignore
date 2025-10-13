@@ -97,7 +97,6 @@ local_settings.py
 manage.py
 
 # Specific file extensions (language-specific)
-*.py
 *.ipynb
 *.js
 *.jsx
