@@ -22,7 +22,7 @@ def _format_prompt(file_path):
     with open(file_path, 'r') as f:
         file_content = f.read()
     
-    prompt = f"You are a code repair assistant.
+    prompt = f"""You are a code repair assistant.
     The following Python file has been automatically mutated. Some lines of code were deleted and replaced with the marker `#mutator_was_here`. Your task is to infer and regenerate the missing code for each of those deleted sections.
     
     Instructions:
@@ -36,7 +36,7 @@ def _format_prompt(file_path):
     Here is the current content of the file:
     ```python{file_content}```
     Please return the entire repaired file with your changes included.
-    "
+    """
 
 def _run_fix(file_path, anthropic_api_key):
     client = anthropic.Anthropic(api_key=anthropic_api_key)
