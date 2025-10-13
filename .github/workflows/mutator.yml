@@ -105,16 +105,20 @@ jobs:
           echo "$MUTATION_OUTPUT" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
-      - name: Summarize mutation context
+      - name: Generate PR-friendly summary
         id: summary
         run: |
-          SUMMARY=$(jq -r '
-            "Timestamp: \(.timestamp)\nMutation ID: \(.mutation_id)\nFlavor: \(.config.flavor)\nMutated Files:\n" +
-            (.mutations[] | "  - \(.file) lines \(.start_line)–\(.start_line + .deleted_line_count - 1)")
-          ' .mutation-context.json)
-          echo "mutation_summary<<EOF" >> $GITHUB_OUTPUT
-          echo "$SUMMARY" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          TIMESTAMP=$(jq -r '.timestamp' .mutation-context.json)
+          MUTATION_ID=$(jq -r '.mutation_id' .mutation-context.json)
+          FLAVOR=$(jq -r '.config.flavor' .mutation-context.json)
+
+          # Create Markdown table rows
+          FILES_TABLE=$(jq -r '.mutations[] | "| \(.file) | \(.start_line) | \(.deleted_line_count) | \(.added_code // "N/A") |"' .mutation-context.json)
+
+          echo "timestamp=$TIMESTAMP" >> $GITHUB_OUTPUT
+          echo "mutation_id=$MUTATION_ID" >> $GITHUB_OUTPUT
+          echo "flavor=$FLAVOR" >> $GITHUB_OUTPUT
+          echo "mutated_files_table=$FILES_TABLE" >> $GITHUB_OUTPUT
 
       - name: Create Pull Request to main
         id: pr
@@ -127,9 +131,26 @@ jobs:
           committer: "Bodybuilder[Bot] <bodybuilders@bodybuilders.com>"
           author: "Bodybuilders[Bot] <bodybuilders@bodybuilders.com>"
           body: |
-            **Mutation Summary:**
-            ${{ steps.summary.outputs.mutation_summary }}
+            # 🤖 Automated Mutation Pull Request
 
+            **Mutation Details**
+
+            - **Timestamp:** ${{ steps.capture.outputs.timestamp }}
+            - **Mutation ID:** ${{ steps.capture.outputs.mutation_id }}
+            - **Flavor:** ${{ steps.capture.outputs.flavor }}
+
+            **Mutated Files**
+            | File | Start Line | Deleted Lines | Added Code |
+            |------|------------|---------------|------------|
+            ${{ steps.capture.outputs.mutated_files_table }}
+
+            **Summary**
+            The mutations above were applied automatically by `mutator.py` and reviewed/fixed by `fixer.py`. Please review the PR and merge if everything looks correct.
+
+            **Full JSON Context**
+            ```json
+            ${{ steps.capture.outputs.mutation_output }}
+            ```
           delete-branch: false
 
       - name: Output PR info
