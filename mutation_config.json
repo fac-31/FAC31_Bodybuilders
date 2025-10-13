@@ -23,8 +23,8 @@
     },
     "mutation_size": {
       "type": "linear",
-      "min_percent": 3,
-      "max_percent": 33,
+      "min_percent": 4,
+      "max_percent": 20,
       "start_probability": 0.60,
       "end_probability": 0.05
     }
@@ -38,8 +38,8 @@
     },
     "mutation_size": {
       "type": "linear",
-      "min_percent": 10,
-      "max_percent": 40,
+      "min_percent": 5,
+      "max_percent": 25,
       "start_probability": 0.50,
       "end_probability": 0.10
     }

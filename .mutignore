@@ -62,6 +62,8 @@ Makefile
 test_projects/*
 !test_projects/simpletic/
 !test_projects/simpletic/**
+test_projects/simpletic/.mutignores
+test_projects/simpletic/requirements.txt
 # Test and data fixtures
 tests/
 test/

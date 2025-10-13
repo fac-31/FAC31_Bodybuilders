@@ -10,6 +10,9 @@ import os
 import anthropic
 import sys
 from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv()
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 if str(ROOT_DIR) not in sys.path:
@@ -17,11 +20,12 @@ if str(ROOT_DIR) not in sys.path:
 
 from utils.context_utils import MutationContext
 
+
 def _format_prompt(file_path):
     file_content = None
-    with open(file_path, 'r') as f:
+    with open(file_path, "r") as f:
         file_content = f.read()
-    
+
     return f"""You are a code repair assistant.
     The following Python file has been automatically mutated. Some lines of code were deleted and replaced with the marker `#mutator_was_here`. Your task is to infer and regenerate the missing code for each of those deleted sections.
     
@@ -35,8 +39,9 @@ def _format_prompt(file_path):
     File path: `{file_path}`
     Here is the current content of the file:
     ```python{file_content}```
-    Please return the entire repaired file with your changes included.
+    Please return ONLY the entire repaired file content (WITHOUT ```python ``` bracketing) with your changes included, nothing else.
     """
+
 
 def _run_fix(file_path, anthropic_api_key):
     client = anthropic.Anthropic(api_key=anthropic_api_key)
@@ -47,10 +52,11 @@ def _run_fix(file_path, anthropic_api_key):
         max_tokens=4000,
         temperature=1,
         system="You are a helpful code assistant.",
-        messages=[{"role": "user", "content": prompt}]
+        messages=[{"role": "user", "content": prompt}],
     )
 
-    return message.completion
+    return message.content[0].text
+
 
 def main():
     try:
@@ -63,9 +69,10 @@ def main():
     anthropic_api_key = os.getenv("LLM_API_KEY")
 
     repaired_file_content = _run_fix(file_path, anthropic_api_key)
-
+    print(f"Repaired file content:\n{repaired_file_content}")
     with open(file_path, "w") as f:
         f.write(repaired_file_content)
+
 
 if __name__ == "__main__":
     main()
