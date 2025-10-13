@@ -26,6 +26,27 @@
       "start_line": 14,
       "deleted_line_count": 13,
       "added_code": null
+    },
+    {
+      "id": "mut-4",
+      "file": "./test_projects/simpletic/application.py",
+      "start_line": 27,
+      "deleted_line_count": 4,
+      "added_code": null
+    },
+    {
+      "id": "mut-5",
+      "file": "./test_projects/simpletic/application.py",
+      "start_line": 16,
+      "deleted_line_count": 1,
+      "added_code": null
+    },
+    {
+      "id": "mut-6",
+      "file": "./test_projects/simpletic/application.py",
+      "start_line": 14,
+      "deleted_line_count": 2,
+      "added_code": null
     }
   ]
 }
