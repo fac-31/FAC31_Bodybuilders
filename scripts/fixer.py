@@ -43,11 +43,11 @@ def _run_fix(file_path, anthropic_api_key):
     prompt = _format_prompt(file_path)
 
     message = client.messages.create(
-        model="claude-3-sonnet-20240229",
+        model="claude-sonnet-4-5-20250929",
         max_tokens=4000,
         temperature=1,
         system="You are a helpful code assistant.",
-        messages=[{"role": "user", "content": prompt}]
+        messages=[{"role": "user", "content": [prompt]}]
     )
 
     return message.content[0].text
