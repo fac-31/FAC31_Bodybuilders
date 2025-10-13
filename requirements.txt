@@ -3,4 +3,4 @@
 # TODO: Add dependencies (e.g., openai, anthropic, requests, etc.)
 pathspec
 anthropic
-dotenv
+python-dotenv
