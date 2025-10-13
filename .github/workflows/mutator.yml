@@ -100,7 +100,7 @@ jobs:
       - name: Capture mutation context
         id: capture
         run: |
-          MUTATION_OUTPUT=$(cat mutation-context.json)
+          MUTATION_OUTPUT=$(cat .mutation-context.json)
           echo "mutation_output<<EOF" >> $GITHUB_OUTPUT
           echo "$MUTATION_OUTPUT" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
@@ -111,7 +111,7 @@ jobs:
           SUMMARY=$(jq -r '
             "Timestamp: \(.timestamp)\nMutation ID: \(.mutation_id)\nFlavor: \(.config.flavor)\nMutated Files:\n" +
             (.mutations[] | "  - \(.file) lines \(.start_line)–\(.start_line + .deleted_line_count - 1)")
-          ' mutation-context.json)
+          ' .mutation-context.json)
           echo "mutation_summary<<EOF" >> $GITHUB_OUTPUT
           echo "$SUMMARY" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
